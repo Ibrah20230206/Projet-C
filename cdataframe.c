@@ -181,14 +181,14 @@ void hard_fill_cdataframe(CDataframe *df) {
     if (!df) return;
 
     // Example of predefined data
-    Column *col1 = create_column("Sample Column 1");
+    Column *col1 = create_column("Hard filled Column 1");
     int values1[] = {10, 20, 30, 40, 50};
     for (int i = 0; i < sizeof(values1) / sizeof(values1[0]); i++) {
         insert_value(col1, values1[i]);
     }
     add_column(df, col1);
 
-    Column *col2 = create_column("Sample Column 2");
+    Column *col2 = create_column("Hard filled Column 2");
     int values2[] = {5, 15, 25, 35, 45};
     for (int i = 0; i < sizeof(values2) / sizeof(values2[0]); i++) {
         insert_value(col2, values2[i]);
