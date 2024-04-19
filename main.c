@@ -29,6 +29,10 @@ int main() {
     fill_cdataframe_with_input(df);
     display_cdataframe(df);
 
+    // Free and recreate the dataframe to avoid mixing user input with hardcoded data
+    free_cdataframe(df);
+    df = create_cdataframe();
+
     printf("\nFilling dataframe with hardcoded data:\n");
     hard_fill_cdataframe(df);
     display_cdataframe(df);
