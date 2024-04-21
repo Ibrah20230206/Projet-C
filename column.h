@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Structure for a column (4.1)
+
 typedef struct {
     char *title;         // Title of the column (4.1.1)
     int *data;           // Pointer to integer array (4.1.1)
