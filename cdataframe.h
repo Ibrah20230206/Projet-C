@@ -5,9 +5,9 @@
 #ifndef CDATAFRAME_H
 #define CDATAFRAME_H
 
-#include "column.h"  // Include the definition of Column
+#include "column.h"
 
-// CDataframe structure
+
 typedef struct {
     Column **columns;    // Array of pointers to Columns
     int num_columns;     // Number of columns
@@ -23,4 +23,4 @@ void add_column(CDataframe *df, Column *col);
 void delete_column_from_dataframe(CDataframe *df, const char *title);
 void free_cdataframe(CDataframe *df);
 
-#endif //CDATAFRAME_H
+#endif
