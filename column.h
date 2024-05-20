@@ -6,12 +6,15 @@
 #include <string.h>
 
 
+
 typedef struct {
     char *title;         // Title of the column (4.1.1)
     int *data;           // Pointer to integer array (4.1.1)
     int capacity;
     unsigned int size;   // Logical size of the column (4.1.1)
     unsigned int max_size;// Physical size of the array (4.1.1)
+    void * index;
+    int column_type;
 } Column;
 
 // Function declarations
