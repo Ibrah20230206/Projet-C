@@ -1,91 +1,128 @@
-#include "column.h"
+#include <stdio.h>
 #include "cdataframe.h"
-
+#include "list.h"
 
 int main() {
-    // Testing individual column operations
-    printf("Testing individual column operations:\n");
-    Column *my_col = create_column("My column");
-    insert_value(my_col, 10);
-    insert_value(my_col, 20);
-    insert_value(my_col, 10);
-    insert_value(my_col, 30);
-    print_col(my_col);
+    // Test create_column and insert_value functions
+    Column *col1 = create_column("Column 1");
+    insert_value(col1, 10);
+    insert_value(col1, 20);
+    insert_value(col1, 30);
 
-    // Display various statistics and counts
-    printf("Occurrences of 10: %d\n", count_value(my_col, 10));
-    printf("Value at index 1: %d\n", value_at_index(my_col, 1));
-    printf("Maximum value: %d\n", find_max(my_col));
-    printf("Number of values less than 15: %d\n", count_less_than(my_col, 20));
-    printf("Number of values equal to 10: %d\n", count_equals_x(my_col, 30));
+    // Test print_col function
+    printf("Column :\n");
+    print_col(col1);
 
-    // Clean up memory for column
-    delete_column(&my_col);
+    // Test delete_column function
+    delete_column(&col1);
 
-    // Testing dataframe operations
-   // Create a dataframe
-    CDataframe *df = create_cdataframe();
+    // Test count_value function
+    Column *col2 = create_column("My column");
+    insert_value(col2, 10);
+    insert_value(col2, 20);
+    insert_value(col2, 30);
+    insert_value(col2, 10);
+    printf("Count of value 10 in my column: %d\n", count_value(col2, 10));
 
-    // Fill the dataframe with user input
-    printf("Filling dataframe with user input:\n");
-    fill_cdataframe_with_input(df);
-    display_cdataframe(df);
+    // Test value_at_index function
+    printf("Value at index 2 in my column: %d\n", value_at_index(col2, 2));
 
-    // Hard fill the dataframe
-    printf("\nFilling dataframe with hardcoded data:\n");
-    hard_fill_cdataframe(df);
-    display_cdataframe(df);
+    // Test find_max function
+    printf("Max value in my column: %d\n", find_max(col2));
 
-    // Display rows
-    printf("\nDisplaying first 3 rows:\n");
-    display_rows(df, 3);
+    // Test count_less_than function
+    printf("Count of values less than 20 in my column: %d\n", count_less_than(col2, 20));
 
-    // Display columns
-    printf("\nDisplaying first 2 columns:\n");
-    display_columns(df, 2);
+    // Test count_equals_x function
+    printf("Count of values equal to 10 in my column: %d\n", count_equals_x(col2, 10));
 
-    // Add a row
-    int new_row_values[] = {99, 88, 77};
-    add_row(df, new_row_values, 3);
-    printf("\nAdding a new row:\n");
-    display_cdataframe(df);
 
-    // Delete a row
-    printf("\nDeleting row at index 1:\n");
-    delete_row(df, 1);
-    display_cdataframe(df);
+    // Test create_cdataframe and fill_cdataframe_with_input functions
+    printf("\nCreating and filling a CDataframe from user input...\n");
+    CDataframe *df1 = create_cdataframe();
+    fill_cdataframe_with_input(df1);
+    display_cdataframe(df1);
 
-    // Rename a column
-    printf("\nRenaming column 'Column 1' to 'New Column 1':\n");
-    rename_column(df, "Column 1", "New Column 1");
-    display_cdataframe(df);
+    // Test sort function
+ printf("\nSorting the first column in ascending order...\n");
+    sort(df1->columns[0], ASC);
+    display_cdataframe(df1);
 
-    // Search for a value
-    printf("\nSearching for value 42 in the dataframe: %s\n", search_value(df, 42) ? "Found" : "Not found");
+    // Allocate memory space here
+    // For example:
+    // Let's allocate memory for an array of 100 integers
+    int *dynamic_array = (int *)malloc(100 * sizeof(int));
+    if (dynamic_array == NULL) {
+        printf("Memory allocation failed.\n");
+        return 1; // Or handle the failure in some appropriate way
+    }
 
-    // Get a value
-    printf("\nValue at row 0, column 1: %d\n", get_value(df, 0, 1));
+    // Now you can use dynamic_array like a regular array
 
-    // Replace a value
-    printf("\nReplacing value at row 0, column 1 with 99:\n");
-    replace_value(df, 0, 1, 99);
-    display_cdataframe(df);
+    // Test add_row function
+    printf("\nAdding a row to the CDataframe...\n");
+    int new_row[] = {130, 140, 150, 160};
+    add_row(df1, new_row, 4);
+    display_cdataframe(df1);
 
-    // Display column names
-    printf("\nDisplaying column names:\n");
-    display_column_names(df);
+    // Don't forget to free the allocated memory when you're done using it
+    free(dynamic_array);
 
-    // Get number of rows and columns
-    printf("\nNumber of rows: %d\n", num_rows(df));
-    printf("Number of columns: %d\n", num_columns(df));
+    // Test delete_row function
+    printf("\nDeleting a row from the CDataframe...\n");
+    delete_row(df1, 1);
+    display_cdataframe(df1);
 
-    // Count cells equal to, greater than, and less than a value
-    printf("\nCount cells equal to 42: %d\n", count_cells_equal_to(df, 42));
-    printf("Count cells greater than 50: %d\n", count_cells_greater_than(df, 50));
-    printf("Count cells less than 30: %d\n", count_cells_less_than(df, 30));
+    // Test rename_column function
+    printf("\nRenaming a column in the CDataframe...\n");
+    rename_column(df1, "Column2", "Renamed Column");
+    display_cdataframe(df1);
 
-    // Free dataframe memory
-    free_cdataframe(df);
+    // Test search_value function
+    printf("\nSearching for a value in the CDataframe...\n");
+    printf("Value 100 exists in the CDataframe: %s\n", search_value(df1, 100) ? "true" : "false");
 
-    return 0;
+    // Test get_value function
+    printf("\nAccessing a value in the CDataframe...\n");
+    printf("Value at row 1, column 2: %d\n", get_value(df1, 0, 1));
+
+    // Test replace_value function
+    printf("\nReplacing a value in the CDataframe...\n");
+    replace_value(df1, 0, 1, 200);
+    display_cdataframe(df1);
+
+    // Test display_column_names function
+    printf("\nDisplaying column names of the CDataframe...\n");
+    display_column_names(df1);
+
+    // Test num_rows function
+    printf("\nNumber of rows in the CDataframe: %d\n", num_rows(df1));
+
+    // Test num_columns function
+    printf("Number of columns in the CDataframe: %d\n", num_columns(df1));
+
+    // Test count_cells_equal_to function
+    printf("Number of cells equal to 150 in the CDataframe: %d\n", count_cells_equal_to(df1, 150));
+
+    // Test count_cells_greater_than function
+    printf("Number of cells greater than 100 in the CDataframe: %d\n", count_cells_greater_than(df1, 100));
+
+    // Test count_cells_less_than function
+    printf("Number of cells less than 150 in the CDataframe: %d\n", count_cells_less_than(df1, 150));
+
+    // Test load_from_csv function
+    printf("\nLoading data from CSV file...\n");
+    ENUM_TYPE dftype[] = {INT, INT, INT, INT};
+    CDataframe *csv_df = load_from_csv("data.csv", dftype, 4);
+    if (csv_df != NULL) {
+        display_cdataframe(csv_df);
+    }
+
+    // Test save_into_csv function
+    printf("\nSaving dataframe into CSV file...\n");
+    save_into_csv(df1, "saved_data.csv");
+
+    delete_cdataframe(&df1);
+
 }
+

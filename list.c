@@ -7,7 +7,7 @@
 #include "list.h"
 
 CDataframe* load_from_csv(char *file_name, ENUM_TYPE *dftype, int size) {
-    FILE *file = fopen(file_name, "r");
+    FILE *file = fopen(file_name, "w");
     if (file == NULL) {
         printf("Error: Failed to open file for reading.\n");
         return NULL;

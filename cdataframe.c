@@ -104,27 +104,25 @@ int count_equals_x(const Column *column, int x) {
     return count;
 }
 
-// Implementations for Column functions
 // Implementations for CDataframe functions
 CDataframe* create_cdataframe() {
     CDataframe *df = malloc(sizeof(CDataframe));
-    if (!df) return NULL;
+    if (!df) {
+        printf("Memory allocation failed.\n");
+        return NULL;
+    }
     df->columns = NULL;
     df->num_columns = 0;
     df->capacity = 0;
     return df;
 }
-// Function to create a new column
-
 
 int insert_cdataframe_value(COLUMN *col, void *value) {
-    // Check if the column is valid
     if (col == NULL) {
         printf("Invalid column.\n");
         return -1;
     }
 
-    // Check if the value is valid
     if (value == NULL) {
         printf("Invalid value.\n");
         return -1;
@@ -143,13 +141,13 @@ int insert_cdataframe_value(COLUMN *col, void *value) {
         return -1;
     }
 
-    // Copy the value (INT type)
+
     *((int *)col->data[col->size]) = *((int *)value);
 
     // Increment the size of the column
     col->size++;
 
-    return 0; // Successful insertion
+    return 0;
 }
 
 void print_cdataframe_col(const Column *col) {
@@ -161,7 +159,6 @@ void print_cdataframe_col(const Column *col) {
 }
 
 
-
 void fill_cdataframe_with_input(CDataframe *df) {
     if (df == NULL) {
         printf("Error: Null pointer to dataframe.\n");
@@ -171,9 +168,15 @@ void fill_cdataframe_with_input(CDataframe *df) {
     // Get the number of rows and columns
     int num_rows, num_columns;
     printf("Enter the number of rows: ");
-    scanf("%d", &num_rows);
+    if (scanf("%d", &num_rows) != 1 || num_rows <= 0) {
+        printf("Invalid input for number of rows.\n");
+        return;
+    }
     printf("Enter the number of columns: ");
-    scanf("%d", &num_columns);
+    if (scanf("%d", &num_columns) != 1 || num_columns <= 0) {
+        printf("Invalid input for number of columns.\n");
+        return;
+    }
 
     // Set the dimensions of the dataframe
     df->num_columns = num_columns;
@@ -186,12 +189,15 @@ void fill_cdataframe_with_input(CDataframe *df) {
         return;
     }
 
-    // Prompt user to enter column titles
-    for (int i = 0; i < num_columns; ++i)
-        {
+    // Prompt user to enter column titles and data
+    for (int i = 0; i < num_columns; ++i) {
         char title[100];
         printf("Enter title for column %d: ", i + 1);
-        scanf("%s", title);
+        if (scanf("%99s", title) != 1) {
+            printf("Invalid input for column title.\n");
+            return;
+        }
+
         // Allocate memory for column structure
         df->columns[i] = malloc(sizeof(Column));
         if (df->columns[i] == NULL) {
@@ -201,19 +207,28 @@ void fill_cdataframe_with_input(CDataframe *df) {
 
         // Set column title
         df->columns[i]->title = strdup(title);
+        if (df->columns[i]->title == NULL) {
+            printf("Memory allocation failed.\n");
+            return;
+        }
+
         // Allocate memory for column data
         df->columns[i]->data = malloc(num_rows * sizeof(int));
         if (df->columns[i]->data == NULL) {
             printf("Memory allocation failed.\n");
             return;
         }
+
         // Prompt user to input data for each column
         printf("Enter values for column %d:\n", i + 1);
         for (int j = 0; j < num_rows; ++j) {
             printf("Row %d: ", j + 1);
-            scanf("%d", &df->columns[i]->data[j]);
+            if (scanf("%d", &df->columns[i]->data[j]) != 1) {
+                printf("Invalid input for column data.\n");
+                return;
+            }
         }
-        // Set column size
+
         df->columns[i]->size = num_rows;
     }
 }
@@ -223,7 +238,14 @@ void hard_fill_cdataframe(CDataframe *df) {
         printf("Error: Null pointer to dataframe.\n");
         return;
     }
-
+// Release any existing memory allocated for columns array
+    if (df->columns != NULL) {
+        for (int i = 0; i < df->num_columns; ++i) {
+            delete_cdataframe(&df->columns[i]);
+        }
+        free(df->columns);
+        df->columns = NULL;
+    }
     // Predefined values to fill the dataframe
     int data[3][4] = {
         {10, 20, 30, 40},
@@ -235,7 +257,7 @@ void hard_fill_cdataframe(CDataframe *df) {
     int num_rows = 3;
     int num_columns = 4;
     df->num_columns = num_columns;
-    df->capacity = num_rows; // Capacity for dynamic resizing if needed
+    df->capacity = num_rows;
 
     // Allocate memory for columns array
     df->columns = malloc(num_columns * sizeof(Column *));
@@ -259,6 +281,7 @@ void hard_fill_cdataframe(CDataframe *df) {
         }
     }
 }
+
 
 
 void display_cdataframe(const CDataframe *df) {
@@ -351,11 +374,7 @@ void add_row(CDataframe *df, int *values, int num_values) {
         printf("Error: Null pointer or empty dataframe.\n");
         return;
     }
-
-    if (num_values != df->num_columns) {
-        printf("Error: Number of values does not match the number of columns.\n");
-        return;
-    }
+    
 
     // Allocate memory for the new row
     for (int i = 0; i < df->num_columns; ++i) {
@@ -381,8 +400,6 @@ void delete_row(CDataframe *df, int row_index) {
         printf("Error: Null pointer or empty dataframe.\n");
         return;
     }
-
-    // Check if row_index is valid
     if (row_index < 0 || row_index >= df->columns[0]->size) {
         printf("Error: Invalid row index.\n");
         return;
@@ -393,7 +410,6 @@ void delete_row(CDataframe *df, int row_index) {
         for (int j = row_index; j < df->columns[i]->size - 1; ++j) {
             df->columns[i]->data[j] = df->columns[i]->data[j + 1];
         }
-        // Decrease column size
         df->columns[i]->size--;
     }
 }
@@ -430,7 +446,7 @@ void rename_column(CDataframe *df, const char *old_title, const char *new_title)
 
 
 // Function to check the existence of a value in the CDataframe
-#include <stdbool.h> // Include for boolean type
+#include <stdbool.h>
 
 // Function to check if a value exists in the dataframe
 bool search_value(const CDataframe *df, int value) {
@@ -457,25 +473,25 @@ bool search_value(const CDataframe *df, int value) {
 int get_value(const CDataframe *df, int row, int column) {
     if (df == NULL || df->columns == NULL) {
         printf("Error: Null pointer or empty dataframe.\n");
-        return -1; // Return a sentinel value to indicate an error
+        return -1;
     }
 
     // Check if the row index is valid
     if (row < 0 || row >= df->capacity) {
         printf("Error: Invalid row index.\n");
-        return -1; // Return a sentinel value to indicate an error
+        return -1;
     }
 
     // Check if the column index is valid
     if (column < 0 || column >= df->num_columns) {
         printf("Error: Invalid column index.\n");
-        return -1; // Return a sentinel value to indicate an error
+        return -1;
     }
 
     // Retrieve the value from the specified row and column
     if (row >= df->columns[0]->size) {
         printf("Error: Row index exceeds the number of rows with data.\n");
-        return -1; // Return a sentinel value to indicate an error
+        return -1;
     }
 
     return df->columns[column]->data[row];
@@ -489,13 +505,12 @@ void replace_value(CDataframe *df, int row, int column, int new_value) {
         return;
     }
 
-    // Check if the row index is valid
+
     if (row < 0 || row >= df->capacity) {
         printf("Error: Invalid row index.\n");
         return;
     }
 
-    // Check if the column index is valid
     if (column < 0 || column >= df->num_columns) {
         printf("Error: Invalid column index.\n");
         return;
@@ -533,7 +548,6 @@ int num_rows(const CDataframe *df) {
     }
 
     // Get the number of rows by checking the size of any column
-    // Assuming all columns have the same number of rows
     if (df->num_columns > 0) {
         return df->columns[0]->size;
     } else {
@@ -617,10 +631,9 @@ int count_cells_less_than(const CDataframe *df, int value) {
 
 void free_cdataframe(CDataframe *df) {
     if (df == NULL) {
-        return; // Nothing to free if dataframe pointer is NULL
+        return;
     }
 
-    // Free memory for each column and its data
     for (int i = 0; i < df->num_columns; ++i) {
         Column *col = df->columns[i];
         free(col->title); // Free memory for the column title
@@ -636,19 +649,16 @@ void free_cdataframe(CDataframe *df) {
 }
 
 void convert_value(Column *col, unsigned long long int i, char *str, int size) {
-    // Check if the column and string are valid
     if (col == NULL || str == NULL) {
         printf("Invalid column or string.\n");
         return;
     }
 
-    // Check if the index is within bounds
     if (i >= col->size) {
         printf("Index out of bounds.\n");
         return;
     }
 
-    // Initialize string to empty
     str[0] = '\0';
 
     // Convert the integer value to string
@@ -664,14 +674,15 @@ void sort(COLUMN* col, int sort_dir) {
     }
 
     // Implement sorting algorithm based on sort_dir
-    if (sort_dir == ASC) {
-        // Apply Quick sort algorithm
-        // Implementation omitted for brevity
-    } else if (sort_dir == DESC) {
-        // Apply Quick sort algorithm in descending order
-        // Implementation omitted for brevity
-    } else {
-        printf("Invalid sort direction.\n");
+    int temp;
+    for (int i = 0; i < col->size - 1; ++i) {
+        for (int j = i + 1; j < col->size; ++j) {
+            if (sort_dir == ASC ? col->data[i] > col->data[j] : col->data[i] < col->data[j]) {
+                temp = col->data[i];
+                col->data[i] = col->data[j];
+                col->data[j] = temp;
+            }
+        }
     }
 }
 
@@ -692,8 +703,8 @@ void print_col_by_index(Column *col) {
     // Print each element of the column according to its index
     for (unsigned int i = 0; i < col->size; ++i) {
         unsigned long long idx = &col->index[i];
-        int *value_ptr = (int *)col->data[idx]; // Cast the void* to int*
-        int value = *value_ptr; // Dereference to get the actual value
+        int *value_ptr = (int *)col->data[idx];
+        int value = *value_ptr;
 
         printf("[%llu] %d\n", idx, value);
     }
@@ -754,14 +765,11 @@ int search_value_in_column(COLUMN *col, void *val) {
         return -1; // or any other suitable error code
     }
     int target_value = *((int *)val);
-    // Iterate through the column's data array to find the target value
     for (unsigned int i = 0; i < col->size; ++i) {
         if (*((int *)col->data[i]) == target_value) {
             return i; // Return the index if value is found
         }
     }
-
-    // If the value is not found, return -1 or any other suitable error code
     return -1;
 }
 
